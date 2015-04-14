@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- dependencies -->
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+      <!-- your scripts -->
+    <script src="env/config.js"></script>
+    <script src="scripts/app.js"></script>
+    <!-- <script src="scripts/appbb.js"></script> -->
+  </head>
+  <body>
+    <div id="main">
+      <h1>chatterbox</h1>
+      <!-- Your HTML goes here! -->
+        <form>
+          <input id="message" type="text">
+          <button id="submit">submit</button>
+        </form>
+        <button class="get-latest-messages">get latest messages</button>
+
+        <div id="chats"></div>
+    </div>
+
+    <div id="sidebar">
+      <div id="friends">
+        <h2>Friends</h2>
+      </div>
+
+      <div>
+        <h2>Rooms</h2>
+        <button class="all-rooms">all rooms</button>
+        <input type="text" class="room-create">
+        <button class="room-submit">add room</button>
+        <div id="roomSelect"></div>
+      </div>
+    </div>
+  </body>
+</html>

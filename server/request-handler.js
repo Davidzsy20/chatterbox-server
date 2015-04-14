@@ -11,6 +11,19 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var urlParser = require('url');
+
+var messages = [];
+
+var endMessage = function(response, statusCode, data) {
+  // See the note below about CORS headers.
+  //console.log(statusCode);
+  console.log("INSIDE OF END MESSAGE",data);
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = "text/plain";
+  response.writeHead(statusCode, headers);
+  response.end(JSON.stringify({results:messages}));
+};
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -29,30 +42,68 @@ var requestHandler = function(request, response) {
   // console.logs in your code.
   console.log("Serving request type " + request.method + " for url " + request.url);
 
+  var requestMethod = request.method;
   // The outgoing status.
-  var statusCode = 200;
+  var statusCode;
 
-  // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
+  var urlParts = urlParser.parse(request.url);
 
-  // Tell the client we are sending them plain text.
-  //
-  // You will need to change this if you are sending something
-  // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "text/plain";
+  if (urlParts.pathname === '/classes/messages') {
+      if (requestMethod === 'GET') {
+        statusCode = 200;
+        var headers = defaultCorsHeaders;
+        headers['Content-Type'] = "text/plain";
+        response.writeHead(statusCode, headers);
+        response.end(JSON.stringify({results:messages}));
+      } else if(requestMethod === 'POST') {
+        var data = "";
+        request.on("data", function(chunk){
+          data += chunk;
+          console.log("ON DATA: ", data);
+        });
+        request.on('end', function(){
+          console.log("ON END: ", data);
+          messages.push(JSON.parse(data));
+          statusCode = 201;
+          var headers = defaultCorsHeaders;
+          headers['Content-Type'] = "text/plain";
+          response.writeHead(statusCode, headers);
+          response.end(JSON.stringify({results:messages}));
+        });
+      }
+      //cooper changes stuff
 
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+      //Im chaning stuff here
 
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+      // Tell the client we are sending them plain text.
+      //
+      // You will need to change this if you are sending something
+      // other than plain text, like JSON or HTML.
+      // headers['Content-Type'] = "text/plain";
+
+      // .writeHead() writes to the request line and headers of the response,
+      // which includes the status and all headers.
+
+      // Make sure to always call response.end() - Node may not send
+      // anything back to the client until you do. The string you pass to
+      // response.end() will be the body of the response - i.e. what shows
+      // up in the browser.
+      //
+      // Calling .end "flushes" the response's internal buffer, forcing
+      // node to actually send all the data over to the client.
+
+  }else{
+    console.log("YAY");
+    statusCode = 404;
+     var headers = defaultCorsHeaders;
+     headers['Content-Type'] = "text/plain";
+     response.writeHead(statusCode, headers);
+     response.end(JSON.stringify({results:messages}));
+  }
+
+
+
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -70,4 +121,6 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
+module.exports = requestHandler;
 
