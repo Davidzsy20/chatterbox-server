@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     rooms: [],
 
-    roomname: 'lobby',
+    roomname: 'LOBBY',
 
     init: function () {
 
@@ -27,16 +27,8 @@ $(document).ready(function () {
       });
 
       $('.all-rooms').on("click", function () {
+        app.roomname = 'all';
         app.fetch();
-      });
-    },
-
-
-  renewClickHandlers: function () {
-      $('.username').on("click", function () {
-        var username = this.innerHTML;
-        username = app.escapeHtml(username);
-        app.addFriend(username);
       });
 
       $('.room-submit').on("click", function () {
@@ -46,13 +38,37 @@ $(document).ready(function () {
         app.roomname = room;
       });
 
-      $('.roomname').on("click", function () {
+      $('#room-select').on('click', 'div', function() {
         var roomname = this.innerHTML;
         roomname = app.escapeHtml(roomname);
         app.enterRoom(roomname);
         app.roomname = roomname;
       });
+
+      $('#chats').on('click', '.username', function() {
+        var username = this.innerHTML;
+        username = app.escapeHtml(username);
+        app.addFriend(username);
+      });
+
+      app.fetchRooms();
     },
+
+
+  // renewClickHandlers: function () {
+  //     $('.username').on("click", function () {
+  //       var username = this.innerHTML;
+  //       username = app.escapeHtml(username);
+  //       app.addFriend(username);
+  //     });
+
+  //     $('.roomname').on("click", function () {
+  //       var roomname = this.innerHTML;
+  //       roomname = app.escapeHtml(roomname);
+  //       app.enterRoom(roomname);
+  //       app.roomname = roomname;
+  //     });
+  //   },
 
     send: function (message) {
       $.ajax({
@@ -73,7 +89,6 @@ $(document).ready(function () {
     },
 
     fetch: function () {
-
       $.ajax({
         // always use this url
         url: app.server + "/classes/messages",
@@ -88,9 +103,10 @@ $(document).ready(function () {
           data = JSON.parse(data);
           app.clearMessages();
           _.each(data.results, function (message) {
-            app.addMessage(message);
+            if (message.roomname === app.roomname || app.roomname === 'all') {
+              app.addMessage(message);
+            }
           });
-          app.renewClickHandlers();
         },
         error: function (data) {
           // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -110,18 +126,22 @@ $(document).ready(function () {
       if (_.contains(app.friends, message.username)) {
         message.text = '<strong>' + message.text + '</strong>';
       }
-
-      $('#chats').append('<div class="chat"><span class="username">' + message.username + '</span>: ' + message.text + ' | ' + message.roomname + '</div>');
+      $('#chats').prepend('<div class="chat"><span class="username">' + message.username + '</span>: ' + message.text + ' | ' + message.roomname + '</div>');
     },
 
     addRoom: function (roomname) {
+      if(roomname === undefined || roomname === ""){
+        console.log("addRoom: WARNING: no room name");
+        return;
+      }
+
       $.ajax({
         url: app.server + "/classes/room",
         type: 'POST',
         data: JSON.stringify({roomname: roomname}),
         contentType: 'application/json',
         success: function (data) {
-          console.log("data from add room ", data);
+          app.roomname = roomname;
           app.displayRooms(JSON.parse(data).results);
         },
         error: function (data) {
@@ -143,7 +163,6 @@ $(document).ready(function () {
         contentType: 'application/json',
         success: function (data) {
           console.log('chatterbox: rooms received');
-          console.log("results: ", data.results);
           data = JSON.parse(data).results;
           app.displayRooms(data);
         },
@@ -155,10 +174,8 @@ $(document).ready(function () {
     },
 
     displayRooms: function(rooms){
-      console.log(rooms);
       var roomHolder = $('#room-select');
       roomHolder.html("");
-      console.log("RH ", roomHolder);
       _.each(rooms, function(room){
         roomHolder.append("<div>" + room.roomname + "</div>");
       });
@@ -168,25 +185,18 @@ $(document).ready(function () {
     enterRoom: function(roomname){
       $.ajax({
         // always use this url
-        url: app.server,
+        url: app.server + '/classes/messages',
         type: 'GET',
-        data: {
-          order: '-createdAt',
-          limit: 10
-        },
         contentType: 'application/json',
         success: function (data) {
           console.log('chatterbox: Messages received');
           app.clearMessages();
-          $('#roomSelect').html('');
-          app.rooms = [];
-          _.each(data.results, function (message) {
+          _.each(JSON.parse(data).results, function (message) {
             if(message.roomname === roomname) {
               app.addMessage(message);
             }
-            app.addRoom(message.roomname);
+
           });
-          app.renewClickHandlers();
         },
         error: function (data) {
           // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -205,7 +215,7 @@ $(document).ready(function () {
     },
 
     handleSubmit: function (text) {
-      var roomname = "lobby";
+      console.log("app.roomname ", app.roomname);
       var username = window.location.search.slice(10);
       var message = {
         username: username,

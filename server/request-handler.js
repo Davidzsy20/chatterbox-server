@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var urlParser = require('url');
 
-var messages = [{username: "Us", text: "yay for us"}];
+var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
 
 var endMessage = function(response, statusCode, data) {
@@ -86,10 +86,10 @@ var requestHandler = function(request, response) {
       var data = "";
       request.on("data", function(chunk){
         data += chunk;
-        console.log("ON DATA: ", data);
+
       });
       request.on('end', function(){
-        console.log("ON END: ", data);
+
         rooms.push(JSON.parse(data));
         statusCode = 201;
 
