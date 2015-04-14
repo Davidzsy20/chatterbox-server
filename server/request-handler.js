@@ -110,14 +110,19 @@ var requestHandler = function(request, response) {
     var path = urlParts.pathname === '/' ? '/index.html' : urlParts.pathname;
     console.log("the path: ", path);
     fs.readFile("client" + path, function(err, data){
+      if(err){
+        statusCode = 404;
+        headers['Content-Type'] = "text/html";
+        response.writeHead(statusCode, headers);
+        response.end("<h1>This page doesn't exist</h1>");
+      }
+
       statusCode = 200;
       var lastThreeChars = path.slice(-3);
       // console.log(lastThreeChars);
       if(lastThreeChars === 'tml'){
         headers['Content-Type'] = "text/html";
       }else if(lastThreeChars === 'css'){
-         // console.log("this is data", data);
-         // console.log("inside CSS: ", path);
          headers['Content-Type'] = "text/css";
       }else if(lastThreeChars === '.js'){
          headers['Content-Type'] = "text/javascript";
