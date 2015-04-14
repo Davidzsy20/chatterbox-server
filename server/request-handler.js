@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var urlParser = require('url');
+var fs = require('fs');
 
 var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
@@ -50,6 +51,10 @@ var requestHandler = function(request, response) {
   var urlParts = urlParser.parse(request.url);
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = "text/plain";
+
+  console.log(request.url);
+  console.log(urlParts.pathname.slice(8));
+
 
   if (urlParts.pathname === '/classes/messages') {
     if(requestMethod === 'GET') {
@@ -101,12 +106,35 @@ var requestHandler = function(request, response) {
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify({results:rooms}));
     }
-  }else{
+  }else /*if(urlParts.pathname === "/")*/{
+    var path = urlParts.pathname === '/' ? '/index.html' : urlParts.pathname;
+    console.log("the path: ", path);
+    fs.readFile("client" + path, function(err, data){
+      statusCode = 200;
+      var lastThreeChars = path.slice(-3);
+      // console.log(lastThreeChars);
+      if(lastThreeChars === 'tml'){
+        headers['Content-Type'] = "text/html";
+      }else if(lastThreeChars === 'css'){
+         // console.log("this is data", data);
+         // console.log("inside CSS: ", path);
+         headers['Content-Type'] = "text/plain";
+      }else if(lastThreeChars === '.js'){
+         headers['Content-Type'] = "text/javascript";
+      }else{
+        headers['Content-Type'] = "text/plain";
+      }
+
+      response.writeHead(statusCode, headers);
+      response.end(data);
+    });
+
+  }/*else{
     console.log("YAY");
     statusCode = 404;
      response.writeHead(statusCode, headers);
      response.end(JSON.stringify({results:rooms}));
-  }
+  }*/
 
 
     // Tell the client we are sending them plain text.
