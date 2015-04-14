@@ -14,7 +14,7 @@ this file and include it in basic-server.js so that it actually works.
 var urlParser = require('url');
 var fs = require('fs');
 
-//var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
+var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
 // var firstMessage = JSON.stringify({username: "cooper", text: "hello", roomname: "room1"});
 // fs.appendFile('server/messages.txt', firstMessage + "\n", function(err){
@@ -30,6 +30,14 @@ var getMessagesArray = function(statusCode, headers, response){
    response.writeHead(statusCode, headers);
    response.end(JSON.stringify({results:data.toString().split("\n")}));
 
+  });
+};
+
+var writeMessage = function(message){
+  fs.appendFile('server/messages.txt', message + "\n", function(err){
+    if(err){
+      console.log(err);
+    }
   });
 }
 
@@ -84,11 +92,11 @@ var requestHandler = function(request, response) {
       var data = "";
       request.on("data", function(chunk){
         data += chunk;
-        console.log("ON DATA: ", data);
+
       });
       request.on('end', function(){
-        console.log("ON END: ", data);
-        messages.push(JSON.parse(data));
+
+        writeMessage(data);
 
         statusCode = 201;
 
