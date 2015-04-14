@@ -13,7 +13,8 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var urlParser = require('url');
 
-var messages = [{username: "Us", message: "yay for us"}];
+var messages = [{username: "Us", text: "yay for us"}];
+var rooms = [{roomname: "LOBBY"}];
 
 var endMessage = function(response, statusCode, data) {
   // See the note below about CORS headers.
@@ -80,7 +81,7 @@ var requestHandler = function(request, response) {
       statusCode = 200;
 
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify({results:messages}));
+      response.end(JSON.stringify({results:rooms}));
     }else if(requestMethod === 'POST') {
       var data = "";
       request.on("data", function(chunk){
@@ -89,22 +90,22 @@ var requestHandler = function(request, response) {
       });
       request.on('end', function(){
         console.log("ON END: ", data);
-        messages.push(JSON.parse(data));
+        rooms.push(JSON.parse(data));
         statusCode = 201;
 
         response.writeHead(statusCode, headers);
-        response.end(JSON.stringify({results:messages}));
+        response.end(JSON.stringify({results:rooms}));
       });
     }else if(requestMethod === 'OPTIONS'){
       statusCode = 200;
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify({results:messages}));
+      response.end(JSON.stringify({results:rooms}));
     }
   }else{
     console.log("YAY");
     statusCode = 404;
      response.writeHead(statusCode, headers);
-     response.end(JSON.stringify({results:messages}));
+     response.end(JSON.stringify({results:rooms}));
   }
 
 

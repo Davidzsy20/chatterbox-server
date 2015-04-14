@@ -56,7 +56,7 @@ $(document).ready(function () {
 
     send: function (message) {
       $.ajax({
-        url: app.server,
+        url: app.server + "/classes/messages",
         type: 'POST',
         data: JSON.stringify(message),
         contentType: 'application/json',
@@ -85,10 +85,10 @@ $(document).ready(function () {
         contentType: 'application/json',
         success: function (data) {
           console.log('chatterbox: Messages received');
+          data = JSON.parse(data);
           app.clearMessages();
           _.each(data.results, function (message) {
             app.addMessage(message);
-            app.addRoom(message.roomname);
           });
           app.renewClickHandlers();
         },
@@ -115,10 +115,54 @@ $(document).ready(function () {
     },
 
     addRoom: function (roomname) {
-      if (!_.contains(app.rooms, roomname)&& roomname !== undefined) {
-        app.rooms.push(roomname);
-        $('#roomSelect').append('<div class="roomname">' + roomname + '</div>');
-      }
+      $.ajax({
+        url: app.server + "/classes/room",
+        type: 'POST',
+        data: JSON.stringify({roomname: roomname}),
+        contentType: 'application/json',
+        success: function (data) {
+          console.log("data from add room ", data);
+          app.displayRooms(JSON.parse(data).results);
+        },
+        error: function (data) {
+          // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+          console.error('chatterbox: Failed to add message');
+        }
+      });
+    },
+
+    fetchRooms: function(){
+       $.ajax({
+        // always use this url
+        url: app.server + "/classes/room",
+        type: 'GET',
+        // data: {
+        //   // order: '-createdAt',
+        //   // limit: 30
+        // },
+        contentType: 'application/json',
+        success: function (data) {
+          console.log('chatterbox: rooms received');
+          console.log("results: ", data.results);
+          data = JSON.parse(data).results;
+          app.displayRooms(data);
+        },
+        error: function (data) {
+          // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+          console.error('chatterbox: Failed to receive messages');
+        }
+      });
+    },
+
+    displayRooms: function(rooms){
+      console.log(rooms);
+      var roomHolder = $('#room-select');
+      roomHolder.html("");
+      console.log("RH ", roomHolder);
+      _.each(rooms, function(room){
+        roomHolder.append("<div>" + room.roomname + "</div>");
+      });
+
     },
 
     enterRoom: function(roomname){
