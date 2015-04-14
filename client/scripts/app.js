@@ -3,8 +3,8 @@ $(document).ready(function () {
 
   var app = {
 
-    server: 'https://api.parse.com/1/classes/chatterbox',
-
+    //server: 'https://api.parse.com/1/classes/chatterbox',
+    server: 'http://localhost:3000',
     friends: [],
 
     rooms: [],
@@ -76,12 +76,12 @@ $(document).ready(function () {
 
       $.ajax({
         // always use this url
-        url: app.server,
+        url: app.server + "/classes/messages",
         type: 'GET',
-        data: {
-          order: '-createdAt',
-          limit: 30
-        },
+        // data: {
+        //   // order: '-createdAt',
+        //   // limit: 30
+        // },
         contentType: 'application/json',
         success: function (data) {
           console.log('chatterbox: Messages received');

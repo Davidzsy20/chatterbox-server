@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var urlParser = require('url');
 
-var messages = [];
+var messages = [{username: "Us", message: "yay for us"}];
 
 var endMessage = function(response, statusCode, data) {
   // See the note below about CORS headers.
@@ -47,12 +47,13 @@ var requestHandler = function(request, response) {
   var statusCode;
 
   var urlParts = urlParser.parse(request.url);
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = "text/plain";
 
   if (urlParts.pathname === '/classes/messages') {
     if(requestMethod === 'GET') {
       statusCode = 200;
-      var headers = defaultCorsHeaders;
-      headers['Content-Type'] = "text/plain";
+
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify({results:messages}));
     } else if(requestMethod === 'POST') {
@@ -65,17 +66,19 @@ var requestHandler = function(request, response) {
         console.log("ON END: ", data);
         messages.push(JSON.parse(data));
         statusCode = 201;
-        var headers = defaultCorsHeaders;
-        headers['Content-Type'] = "text/plain";
+
         response.writeHead(statusCode, headers);
         response.end(JSON.stringify({results:messages}));
       });
+    }else if(requestMethod === 'OPTIONS'){
+      statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify({results:messages}));
     }
   }else if(urlParts.pathname === '/classes/room'){
     if(requestMethod === 'GET') {
       statusCode = 200;
-      var headers = defaultCorsHeaders;
-      headers['Content-Type'] = "text/plain";
+
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify({results:messages}));
     }else if(requestMethod === 'POST') {
@@ -88,17 +91,18 @@ var requestHandler = function(request, response) {
         console.log("ON END: ", data);
         messages.push(JSON.parse(data));
         statusCode = 201;
-        var headers = defaultCorsHeaders;
-        headers['Content-Type'] = "text/plain";
+
         response.writeHead(statusCode, headers);
         response.end(JSON.stringify({results:messages}));
       });
+    }else if(requestMethod === 'OPTIONS'){
+      statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify({results:messages}));
     }
   }else{
     console.log("YAY");
     statusCode = 404;
-     var headers = defaultCorsHeaders;
-     headers['Content-Type'] = "text/plain";
      response.writeHead(statusCode, headers);
      response.end(JSON.stringify({results:messages}));
   }
