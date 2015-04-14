@@ -118,7 +118,7 @@ var requestHandler = function(request, response) {
       }else if(lastThreeChars === 'css'){
          // console.log("this is data", data);
          // console.log("inside CSS: ", path);
-         headers['Content-Type'] = "text/plain";
+         headers['Content-Type'] = "text/css";
       }else if(lastThreeChars === '.js'){
          headers['Content-Type'] = "text/javascript";
       }else{
