@@ -22,12 +22,13 @@ var rooms = [{roomname: "LOBBY"}];
 //     console.log(err);
 //   }
 // });
-var getMessagesArray = function(){
+var getMessagesArray = function(statusCode, headers, response){
   fs.readFile('server/messages.txt', function(err, data){
   if(err){
 
   }
-  return data.toString().split("\n");
+   response.writeHead(statusCode, headers);
+   response.end(JSON.stringify({results:data.toString().split("\n")}));
 
   });
 }
@@ -75,9 +76,10 @@ var requestHandler = function(request, response) {
   if (urlParts.pathname === '/classes/messages') {
     if(requestMethod === 'GET') {
       statusCode = 200;
-
-      response.writeHead(statusCode, headers);
-      response.end(JSON.stringify({results:messages}));
+      getMessagesArray(statusCode, headers, response);
+      // console.log("MESSAGES RIGHT HERE ", messages);
+      // response.writeHead(statusCode, headers);
+      // response.end(JSON.stringify({results:messages}));
     } else if(requestMethod === 'POST') {
       var data = "";
       request.on("data", function(chunk){

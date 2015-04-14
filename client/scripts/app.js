@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     rooms: [],
 
-    roomname: 'LOBBY',
+    roomname: 'room1',
     username: "",
 
     init: function () {
@@ -108,12 +108,19 @@ $(document).ready(function () {
           console.log('chatterbox: Messages received');
           // localStorage.setItem("data", data);
           // console.log(localStorage.getItem("data"));
+
           data = JSON.parse(data);
+          console.log("THIS DATA HERE: ", data);
 
           app.clearMessages();
           _.each(data.results, function (message) {
-            if (message.roomname === app.roomname || app.roomname === 'all') {
-              app.addMessage(message);
+            //message = JSON.parse(message);
+            if(!message) return;
+
+            var newMessage = JSON.parse(message);
+            console.log("inside message: ", newMessage);
+            if (newMessage.roomname === app.roomname || app.roomname === 'all') {
+              app.addMessage(newMessage);
             }
           });
         },
@@ -129,7 +136,7 @@ $(document).ready(function () {
     },
 
     addMessage: function (message) {
-
+      console.log("inside addMessage: ", message);
       message.text = app.escapeHtml(message.text);
 
       if (_.contains(app.friends, message.username)) {
@@ -146,7 +153,7 @@ $(document).ready(function () {
 
       $.ajax({
         url: app.server + "/classes/room",
-        type: 'POST', 
+        type: 'POST',
         data: JSON.stringify({roomname: roomname}),
         contentType: 'application/json',
         success: function (data) {
