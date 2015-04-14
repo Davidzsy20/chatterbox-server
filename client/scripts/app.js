@@ -10,6 +10,7 @@ $(document).ready(function () {
     rooms: [],
 
     roomname: 'LOBBY',
+    username: "",
 
     init: function () {
 
@@ -50,6 +51,9 @@ $(document).ready(function () {
         username = app.escapeHtml(username);
         app.addFriend(username);
       });
+      console.log(localStorage.getItem("username"));
+      app.username = localStorage.getItem("username") || "";
+      $('.username-select').val(app.escapeHtml(app.username));
 
       app.fetchRooms();
     },
@@ -71,6 +75,7 @@ $(document).ready(function () {
   //   },
 
     send: function (message) {
+
       $.ajax({
         url: app.server + "/classes/messages",
         type: 'POST',
@@ -100,7 +105,10 @@ $(document).ready(function () {
         contentType: 'application/json',
         success: function (data) {
           console.log('chatterbox: Messages received');
+          // localStorage.setItem("data", data);
+          // console.log(localStorage.getItem("data"));
           data = JSON.parse(data);
+
           app.clearMessages();
           _.each(data.results, function (message) {
             if (message.roomname === app.roomname || app.roomname === 'all') {
@@ -217,6 +225,8 @@ $(document).ready(function () {
     handleSubmit: function (text) {
       console.log("app.roomname ", app.roomname);
       var username = $('.username-select').val();
+      app.username = username;
+      localStorage.setItem('username', username);
       var message = {
         username: username,
         text: text,

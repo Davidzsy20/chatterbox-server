@@ -71,6 +71,7 @@ var requestHandler = function(request, response) {
       request.on('end', function(){
         console.log("ON END: ", data);
         messages.push(JSON.parse(data));
+
         statusCode = 201;
 
         response.writeHead(statusCode, headers);
