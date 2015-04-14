@@ -49,33 +49,62 @@ var requestHandler = function(request, response) {
   var urlParts = urlParser.parse(request.url);
 
   if (urlParts.pathname === '/classes/messages') {
-      if (requestMethod === 'GET') {
-        statusCode = 200;
+    if(requestMethod === 'GET') {
+      statusCode = 200;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify({results:messages}));
+    } else if(requestMethod === 'POST') {
+      var data = "";
+      request.on("data", function(chunk){
+        data += chunk;
+        console.log("ON DATA: ", data);
+      });
+      request.on('end', function(){
+        console.log("ON END: ", data);
+        messages.push(JSON.parse(data));
+        statusCode = 201;
         var headers = defaultCorsHeaders;
         headers['Content-Type'] = "text/plain";
         response.writeHead(statusCode, headers);
         response.end(JSON.stringify({results:messages}));
-      } else if(requestMethod === 'POST') {
-        var data = "";
-        request.on("data", function(chunk){
-          data += chunk;
-          console.log("ON DATA: ", data);
-        });
-        request.on('end', function(){
-          console.log("ON END: ", data);
-          messages.push(JSON.parse(data));
-          statusCode = 201;
-          var headers = defaultCorsHeaders;
-          headers['Content-Type'] = "text/plain";
-          response.writeHead(statusCode, headers);
-          response.end(JSON.stringify({results:messages}));
-        });
-      }
-      //cooper changes stuff
+      });
+    }
+  }else if(urlParts.pathname === '/classes/room'){
+    if(requestMethod === 'GET') {
+      statusCode = 200;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify({results:messages}));
+    }else if(requestMethod === 'POST') {
+      var data = "";
+      request.on("data", function(chunk){
+        data += chunk;
+        console.log("ON DATA: ", data);
+      });
+      request.on('end', function(){
+        console.log("ON END: ", data);
+        messages.push(JSON.parse(data));
+        statusCode = 201;
+        var headers = defaultCorsHeaders;
+        headers['Content-Type'] = "text/plain";
+        response.writeHead(statusCode, headers);
+        response.end(JSON.stringify({results:messages}));
+      });
+    }
+  }else{
+    console.log("YAY");
+    statusCode = 404;
+     var headers = defaultCorsHeaders;
+     headers['Content-Type'] = "text/plain";
+     response.writeHead(statusCode, headers);
+     response.end(JSON.stringify({results:messages}));
+  }
 
-      //Im chaning stuff here
 
-      // Tell the client we are sending them plain text.
+    // Tell the client we are sending them plain text.
       //
       // You will need to change this if you are sending something
       // other than plain text, like JSON or HTML.
@@ -92,14 +121,6 @@ var requestHandler = function(request, response) {
       // Calling .end "flushes" the response's internal buffer, forcing
       // node to actually send all the data over to the client.
 
-  }else{
-    console.log("YAY");
-    statusCode = 404;
-     var headers = defaultCorsHeaders;
-     headers['Content-Type'] = "text/plain";
-     response.writeHead(statusCode, headers);
-     response.end(JSON.stringify({results:messages}));
-  }
 
 
 
