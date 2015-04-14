@@ -14,8 +14,24 @@ this file and include it in basic-server.js so that it actually works.
 var urlParser = require('url');
 var fs = require('fs');
 
-var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
+//var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
+// var firstMessage = JSON.stringify({username: "cooper", text: "hello", roomname: "room1"});
+// fs.appendFile('server/messages.txt', firstMessage + "\n", function(err){
+//   if(err){
+//     console.log(err);
+//   }
+// });
+var getMessagesArray = function(){
+  fs.readFile('server/messages.txt', function(err, data){
+  if(err){
+
+  }
+  return data.toString().split("\n");
+
+  });
+}
+
 
 var endMessage = function(response, statusCode, data) {
   // See the note below about CORS headers.

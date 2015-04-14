@@ -51,6 +51,7 @@ $(document).ready(function () {
         username = app.escapeHtml(username);
         app.addFriend(username);
       });
+
       console.log(localStorage.getItem("username"));
       app.username = localStorage.getItem("username") || "";
       $('.username-select').val(app.escapeHtml(app.username));
@@ -145,7 +146,7 @@ $(document).ready(function () {
 
       $.ajax({
         url: app.server + "/classes/room",
-        type: 'POST',
+        type: 'POST', 
         data: JSON.stringify({roomname: roomname}),
         contentType: 'application/json',
         success: function (data) {
