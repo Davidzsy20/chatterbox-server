@@ -216,7 +216,7 @@ $(document).ready(function () {
 
     handleSubmit: function (text) {
       console.log("app.roomname ", app.roomname);
-      var username = window.location.search.slice(10);
+      var username = $('.username-select').val();
       var message = {
         username: username,
         text: text,
