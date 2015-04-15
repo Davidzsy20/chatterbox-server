@@ -14,6 +14,22 @@ this file and include it in basic-server.js so that it actually works.
 var urlParser = require('url');
 var fs = require('fs');
 var _mysql = require('mysql');
+// var Sequelize = require('sequelize');
+// var sequelize = new Sequelize("chatterboxserver", "root", null, {
+//   host: '127.0.0.1',
+//   dialect: "mysql",
+
+// });
+
+// var User = sequelize.define("user", {username: {
+//     type: Sequelize.STRING,
+//   }
+// });
+
+// User.sync({force: true}).then(function(){
+//   return User.create({username:"COOPER"});
+// });
+
 var mysql = _mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -55,27 +71,7 @@ var params = [message.username, message.text, message.roomname];
         response.end(JSON.stringify({results:result}));
     }
   });
-  }
-
-// var params = ["COOPER", "HI 3 YOU AND YOU", "ROOM9"];
-
-// mysql.query("insert into messages(username, text, roomname) values(?,?,?);", params, function(err, result){
-//   if(err){
-//     console.log("error ", err);
-
-//   }else{
-//     console.log("it inserted " + JSON.stringify(result));
-//   }
-// });
-
-// mysql.query("insert into messages values('Cooper','is awesome','room7', null);", function(err, result){
-//   if(err){
-//     console.log("error ", err);
-
-//   }else{
-//     console.log("it inserted " + JSON.stringify(result));
-//   }
-// });
+ }
 
 var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
