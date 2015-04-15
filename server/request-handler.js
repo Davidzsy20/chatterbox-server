@@ -13,6 +13,53 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var urlParser = require('url');
 var fs = require('fs');
+var _mysql = require('mysql');
+var mysql = _mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  database: "chatterboxserver",
+});
+
+mysql.connect(function(err){
+  if(err){
+    console.log("error connecting mysql ", err.stack);
+  }else{
+    console.log("connected as ID ", mysql.threadId);
+  }
+});
+
+var queryMessages = function(statusCode, headers, response){
+  mysql.query("select * from messages;", function(err, result){
+  if(err){
+    console.log("error ", err);
+  }else{
+    //console.log("RESULT ",result);
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify({results:result}));
+  }
+});
+}
+
+
+// var params = ["COOPER", "HI 3 YOU AND YOU", "ROOM9"];
+
+// mysql.query("insert into messages(username, text, roomname) values(?,?,?);", params, function(err, result){
+//   if(err){
+//     console.log("error ", err);
+
+//   }else{
+//     console.log("it inserted " + JSON.stringify(result));
+//   }
+// });
+
+// mysql.query("insert into messages values('Cooper','is awesome','room7', null);", function(err, result){
+//   if(err){
+//     console.log("error ", err);
+
+//   }else{
+//     console.log("it inserted " + JSON.stringify(result));
+//   }
+// });
 
 var messages = [{username: "SYSTEM", text: "WELCOME TO CHAT", roomname: "LOBBY"}];
 var rooms = [{roomname: "LOBBY"}];
@@ -84,7 +131,8 @@ var requestHandler = function(request, response) {
   if (urlParts.pathname === '/classes/messages') {
     if(requestMethod === 'GET') {
       statusCode = 200;
-      getMessagesArray(statusCode, headers, response);
+      queryMessages(statusCode, headers, response);
+      //getMessagesArray(statusCode, headers, response);
       // console.log("MESSAGES RIGHT HERE ", messages);
       // response.writeHead(statusCode, headers);
       // response.end(JSON.stringify({results:messages}));

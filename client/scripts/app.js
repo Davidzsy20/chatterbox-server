@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     rooms: [],
 
-    roomname: 'room1',
+    roomname: 'all',
     username: "",
 
     init: function () {
@@ -108,16 +108,17 @@ $(document).ready(function () {
           console.log('chatterbox: Messages received');
           // localStorage.setItem("data", data);
           // console.log(localStorage.getItem("data"));
-
-          data = JSON.parse(data);
           console.log("THIS DATA HERE: ", data);
+          data = JSON.parse(data);
+
 
           app.clearMessages();
           _.each(data.results, function (message) {
             //message = JSON.parse(message);
             if(!message) return;
 
-            var newMessage = JSON.parse(message);
+            //var newMessage = JSON.parse(message);
+            var newMessage = message;
             console.log("inside message: ", newMessage);
             if (newMessage.roomname === app.roomname || app.roomname === 'all') {
               app.addMessage(newMessage);
