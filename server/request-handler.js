@@ -41,6 +41,22 @@ var queryMessages = function(statusCode, headers, response){
 }
 
 
+var queryInsertMessage = function(message, statusCode, headers, response){
+var params = [message.username, message.text, message.roomname];
+
+  mysql.query("insert into messages(username, text, roomname) values(?,?,?);", params, function(err, result){
+    if(err){
+      console.log("error ", err);
+
+    }else{
+      console.log("it inserted " + JSON.stringify(result));
+
+        response.writeHead(statusCode, headers);
+        response.end(JSON.stringify({results:result}));
+    }
+  });
+  }
+
 // var params = ["COOPER", "HI 3 YOU AND YOU", "ROOM9"];
 
 // mysql.query("insert into messages(username, text, roomname) values(?,?,?);", params, function(err, result){
@@ -71,9 +87,9 @@ var rooms = [{roomname: "LOBBY"}];
 // });
 var getMessagesArray = function(statusCode, headers, response){
   fs.readFile('server/messages.txt', function(err, data){
-  if(err){
+    if(err){
 
-  }
+    }
    response.writeHead(statusCode, headers);
    response.end(JSON.stringify({results:data.toString().split("\n")}));
 
@@ -140,16 +156,14 @@ var requestHandler = function(request, response) {
       var data = "";
       request.on("data", function(chunk){
         data += chunk;
-
       });
       request.on('end', function(){
+        //writeMessage(data);
+        queryInsertMessage(JSON.parse(data), 201, headers, response);
+        // statusCode = 201;
 
-        writeMessage(data);
-
-        statusCode = 201;
-
-        response.writeHead(statusCode, headers);
-        response.end(JSON.stringify({results:messages}));
+        // response.writeHead(statusCode, headers);
+        // response.end(JSON.stringify({results:messages}));
       });
     }else if(requestMethod === 'OPTIONS'){
       statusCode = 200;
